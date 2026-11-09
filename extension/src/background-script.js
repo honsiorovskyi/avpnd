@@ -1,3 +1,7 @@
+// Firefox (Manifest V2) exposes `browser` + `browserAction`; Chrome (Manifest V3) `chrome` + `action`.
+const api = typeof browser !== "undefined" && browser.runtime ? browser : chrome
+const action = api.action || api.browserAction
+
 const red = "#a00000"
 const green = "#008000"
 const grey = "#606060"
@@ -17,15 +21,15 @@ async function getVPNStatus() {
 }
 
 function tag(text, bg, fg) {
-    browser.browserAction.setBadgeText({
+    action.setBadgeText({
         text: text
     })
-    browser.browserAction.setBadgeBackgroundColor({
+    action.setBadgeBackgroundColor({
         color: bg
     })
 
-    if (fg && browser.browserAction.setBadgeTextColor) {
-        browser.browserAction.setBadgeTextColor({
+    if (fg && action.setBadgeTextColor) {
+        action.setBadgeTextColor({
             color: fg
         })
     }
@@ -95,15 +99,18 @@ async function refresh() {
 
 function closeVPNTab(tabId, changeInfo, tab) {
     if (changeInfo.url === SAML_CALLBACK) {
-        browser.tabs.remove(tabId);
+        api.tabs.remove(tabId);
     }
 }
 
-// handle chromium
-if (typeof globalThis.browser === "undefined" || Object.getPrototypeOf(globalThis.browser) !== Object.prototype) {
-    browser = chrome
+api.tabs.onUpdated.addListener(closeVPNTab)
+action.onClicked.addListener(handleBrowserAction)
+
+// Chrome's MV3 service worker can be suspended, which stops the polling loop
+// above; an alarm wakes it up again. (Not available in the Firefox build.)
+if (api.alarms) {
+    api.alarms.create("poll", { periodInMinutes: 0.5 })
+    api.alarms.onAlarm.addListener(monitor)
 }
 
-browser.tabs.onUpdated.addListener(closeVPNTab) 
-browser.browserAction.onClicked.addListener(handleBrowserAction)
 monitor()

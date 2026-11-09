@@ -1,0 +1,38 @@
+{
+  "manifest_version": 2,
+  "name": "avpnd",
+  "version": "__VERSION__",
+  "icons": {
+    "64": "icons/64.png",
+    "48": "icons/48.png",
+    "32": "icons/32.png"
+  },
+  "description": "Controls the avpnd AWS VPN Client wrapper daemon",
+  "browser_action": {
+    "default_icon": {
+      "19": "icons/19.png",
+      "38": "icons/38.png"
+    },
+    "default_title": "avpnd"
+  },
+  "background": {
+    "scripts": [
+      "src/background-script.js"
+    ]
+  },
+  "permissions": [
+    "tabs",
+    "http://127.0.0.1:35002/*"
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "avpnd@avpnd.local",
+      "strict_min_version": "140.0",
+      "data_collection_permissions": {
+        "required": [
+          "none"
+        ]
+      }
+    }
+  }
+}

@@ -49,9 +49,32 @@ Stopping `avpnd` (SIGINT/SIGTERM) does not touch the VPN.
 
 ## Browser extension
 
-`extension/` is a Firefox/Chromium toolbar button (adapted from the `awsvpn` example). The badge shows `on` / `off` / `...` / `err`, and clicking it connects or disconnects through `avpnd` on `127.0.0.1:35002`. It polls every 1s while connecting or disconnecting and every 3s otherwise. It also closes the tab the SAML flow ends on (`http://127.0.0.1:35001/`).
+`extension/` is a toolbar button for Firefox and Chrome (adapted from the `awsvpn` example). The badge shows `on` / `off` / `...` / `err`, and clicking it connects or disconnects through `avpnd` on `127.0.0.1:35002`. It polls every 1s while connecting or disconnecting and every 3s otherwise. It also closes the tab the SAML flow ends on (`http://127.0.0.1:35001/`).
 
-- Firefox: `about:debugging` → This Firefox → Load Temporary Add-on → `extension/manifest.json`
-- Chromium: `chrome://extensions` → Developer mode → Load unpacked → `extension/`
+One script (`extension/src/background-script.js`) serves both browsers; they differ only in manifest. Firefox gets Manifest V2 (`manifest.firefox.json`) and Chrome gets Manifest V3 (`manifest.chrome.json`), because Chrome no longer runs MV2 extensions.
 
-If you change `-listen`, update `AVPND` in `extension/src/background-script.js` and the host permission in `extension/manifest.json`.
+```bash
+make extensions                  # build/extensions/avpnd-{firefox,chrome}-<version>.zip, plus unzipped build/extensions/{firefox,chrome}/
+make extensions VERSION=1.2.3    # set the version
+```
+
+Load an unzipped build for development:
+
+- Firefox: `about:debugging` → This Firefox → Load Temporary Add-on → `build/extensions/firefox/manifest.json`
+- Chrome: `chrome://extensions` → Developer mode → Load unpacked → `build/extensions/chrome`
+
+If you change `-listen`, update `AVPND` in `extension/src/background-script.js` and the host permission in both manifests.
+
+## CI and releases
+
+- `.github/workflows/ci.yml` runs on pushes to `main` and on PRs: `gofmt`, `go vet`, `go test -race`, build, and the extension zips (uploaded as a workflow artifact).
+- `.github/workflows/release.yml` runs on tags `v*`. Push a tag to publish a release:
+
+  ```bash
+  git tag v0.1.0 && git push origin v0.1.0
+  ```
+
+  GoReleaser (`.goreleaser.yaml`) builds `avpnd` for macOS (arm64 and x86_64), archives it, and attaches `avpnd-firefox-<v>.zip`, `avpnd-chrome-<v>.zip` and `checksums.txt` to the GitHub release.
+- `make snapshot` is a local dry run (needs `goreleaser` and a git remote).
+
+The extension zips are unsigned. Firefox release builds only install signed add-ons (submit the zip to addons.mozilla.org, or load it temporarily as above), and Chrome users load the unzipped folder via "Load unpacked" unless it is published on the Chrome Web Store.

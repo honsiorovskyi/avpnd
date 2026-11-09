@@ -1,4 +1,4 @@
-.PHONY: build test install vet fmt check clean help
+.PHONY: build test install vet fmt check clean help extensions snapshot
 
 help:
 	@echo "avpnd - AWS VPN Client wrapper"
@@ -7,6 +7,8 @@ help:
 	@echo "  build   - Build the avpnd binary"
 	@echo "  test    - Run tests"
 	@echo "  check   - Run vet, tests and build"
+	@echo "  extensions - Build the Firefox and Chrome extension zips into build/extensions"
+	@echo "  snapshot   - Local goreleaser dry run (needs goreleaser)"
 	@echo "  vet     - Run go vet"
 	@echo "  install - Install avpnd to GOBIN"
 	@echo "  clean   - Remove build artifacts"
@@ -25,10 +27,17 @@ install: build
 
 clean:
 	rm -f avpnd
+	rm -rf build dist
 	go clean
 
 fmt:
 	gofmt -l .
+
+extensions:
+	scripts/build-extensions.sh $(VERSION)
+
+snapshot:
+	goreleaser release --snapshot --clean
 
 check: vet test build
 	@echo "All checks passed!"

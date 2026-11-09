@@ -5,3 +5,5 @@
 *.so
 .DS_Store
 
+/build
+/dist
