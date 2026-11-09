@@ -1,4 +1,6 @@
 #!/bin/sh
+# Copyright (C) 2026 honsiorovskyi
+# SPDX-License-Identifier: AGPL-3.0-only
 # Builds the browser extensions: build/extensions/avpnd-{firefox,chrome}-<version>.zip
 # Usage: scripts/build-extensions.sh [version]   (a leading "v" and any "-suffix" are stripped;
 # defaults to the latest git tag)
@@ -20,7 +22,7 @@ mkdir -p "$out"
 for browser in firefox chrome; do
   dir="$out/$browser"
   mkdir -p "$dir"
-  cp -R extension/src extension/icons "$dir/"
+  cp -R extension/src extension/icons LICENSE "$dir/"
   sed "s/__VERSION__/$version/" "extension/manifest.$browser.json" > "$dir/manifest.json"
   (cd "$dir" && zip -qr -X "../avpnd-$browser-$version.zip" .)
   echo "built $out/avpnd-$browser-$version.zip"

@@ -1,3 +1,6 @@
+// Copyright (C) 2026 honsiorovskyi
+// SPDX-License-Identifier: AGPL-3.0-only
+
 // Firefox (Manifest V2) exposes `browser` + `browserAction`; Chrome (Manifest V3) `chrome` + `action`.
 const api = typeof browser !== "undefined" && browser.runtime ? browser : chrome
 const action = api.action || api.browserAction

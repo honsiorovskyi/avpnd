@@ -1,3 +1,6 @@
+# Copyright (C) 2026 honsiorovskyi
+# SPDX-License-Identifier: AGPL-3.0-only
+
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 version: 2
 
@@ -30,6 +33,7 @@ archives:
       {{- if eq .Arch "amd64" }}x86_64{{ else }}{{ .Arch }}{{ end }}
     files:
       - README.md
+      - LICENSE
 
 checksum:
   name_template: checksums.txt

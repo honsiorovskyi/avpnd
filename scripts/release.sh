@@ -1,4 +1,6 @@
 #!/bin/sh
+# Copyright (C) 2026 honsiorovskyi
+# SPDX-License-Identifier: AGPL-3.0-only
 # Releases the changes since the last version tag: scripts/release.sh [patch|minor|major]
 #
 # If main has commits after the latest vX.Y.Z tag, this runs vet and tests, tags

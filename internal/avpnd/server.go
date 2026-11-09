@@ -1,3 +1,6 @@
+// Copyright (C) 2026 honsiorovskyi
+// SPDX-License-Identifier: AGPL-3.0-only
+
 // Package avpnd exposes the AWS VPN Client CLI over HTTP.
 package avpnd
 

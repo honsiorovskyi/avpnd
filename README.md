@@ -98,3 +98,7 @@ It does nothing when there are no new commits, and refuses to run off `main`, wi
 - `make snapshot` is a local dry run (needs `goreleaser` and a git remote).
 
 The extension zips are unsigned. Firefox release builds only install signed add-ons (submit the zip to addons.mozilla.org, or load it temporarily as above), and Chrome users load the unzipped folder via "Load unpacked" unless it is published on the Chrome Web Store.
+
+## License
+
+Copyright (C) 2026 honsiorovskyi. Licensed under the [GNU Affero General Public License v3.0](LICENSE) (`AGPL-3.0-only`). The toolbar icon (`extension/icons`) is a separate work under CC BY 4.0; see `extension/icons/LICENSE`.

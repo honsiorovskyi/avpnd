@@ -1,3 +1,6 @@
+# Copyright (C) 2026 honsiorovskyi
+# SPDX-License-Identifier: AGPL-3.0-only
+
 name: Release
 
 on:

@@ -1,3 +1,6 @@
+# Copyright (C) 2026 honsiorovskyi
+# SPDX-License-Identifier: AGPL-3.0-only
+
 # Version comes from the latest git tag (vX.Y.Z), e.g. v0.2.0 or v0.2.0-3-gabc1234-dirty.
 VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
 

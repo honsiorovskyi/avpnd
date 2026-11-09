@@ -3,6 +3,7 @@
   "name": "avpnd",
   "version": "__VERSION__",
   "description": "Controls the avpnd AWS VPN Client wrapper daemon",
+  "author": "honsiorovskyi",
   "icons": {
     "64": "icons/64.png",
     "48": "icons/48.png",

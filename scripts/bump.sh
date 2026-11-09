@@ -1,4 +1,6 @@
 #!/bin/sh
+# Copyright (C) 2026 honsiorovskyi
+# SPDX-License-Identifier: AGPL-3.0-only
 # Tags the next semantic version: scripts/bump.sh [patch|minor|major]  (default: patch)
 # Creates an annotated vX.Y.Z tag on HEAD; it does not push.
 set -eu
