@@ -65,14 +65,34 @@ Load an unzipped build for development:
 
 If you change `-listen`, update `AVPND` in `extension/src/background-script.js` and the host permission in both manifests.
 
+## Versioning
+
+Versions are [semantic](https://semver.org) git tags (`vMAJOR.MINOR.PATCH`); the tag is the only place a version is written down. GoReleaser stamps it into the binary and into both extension manifests.
+
+```bash
+make version                  # current version, from git describe
+make bump                     # tag the next patch version (v0.1.0 -> v0.1.1)
+make bump BUMP=minor          # v0.1.1 -> v0.2.0   (BUMP=major for X.0.0)
+git push origin v0.2.0        # the tag push publishes a release
+./avpnd --version
+```
+
+The usual way to ship is one command:
+
+```bash
+make release                  # if main has commits since the last tag: vet + test, bump patch, push main and the tag
+make release BUMP=minor       # same, with a minor (or major) bump
+make release DRY_RUN=1        # only show what would be released
+```
+
+It does nothing when there are no new commits, and refuses to run off `main`, with a dirty tree, without an `origin` remote, or when `main` is behind `origin/main`. Commits and tag go in one atomic push; if it fails the local tag is removed.
+
+`make bump` only creates the tag locally, and refuses on a dirty tree or when HEAD is already tagged. Pre-release tags (`v1.0.0-rc1`) are ignored when computing the next version.
+
 ## CI and releases
 
 - `.github/workflows/ci.yml` runs on pushes to `main` and on PRs: `gofmt`, `go vet`, `go test -race`, build, and the extension zips (uploaded as a workflow artifact).
-- `.github/workflows/release.yml` runs on tags `v*`. Push a tag to publish a release:
-
-  ```bash
-  git tag v0.1.0 && git push origin v0.1.0
-  ```
+- `.github/workflows/release.yml` runs on tags `v*`. Push a version tag (see Versioning) to publish a release.
 
   GoReleaser (`.goreleaser.yaml`) builds `avpnd` for macOS (arm64 and x86_64), archives it, and attaches `avpnd-firefox-<v>.zip`, `avpnd-chrome-<v>.zip` and `checksums.txt` to the GitHub release.
 - `make snapshot` is a local dry run (needs `goreleaser` and a git remote).

@@ -8,9 +8,25 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"runtime/debug"
 
 	"avpnd/internal/avpnd"
 )
+
+// version is set at build time (-ldflags "-X main.version=..."; GoReleaser
+// does this from the git tag). Plain `go build` / `go install` fall back to
+// the module version.
+var version = "dev"
+
+func buildVersion() string {
+	if version != "dev" {
+		return version
+	}
+	if bi, ok := debug.ReadBuildInfo(); ok && bi.Main.Version != "" && bi.Main.Version != "(devel)" {
+		return bi.Main.Version
+	}
+	return version
+}
 
 func defaultBinary() string {
 	if runtime.GOOS == "darwin" {
@@ -25,7 +41,13 @@ func main() {
 	listen := flag.String("listen", "127.0.0.1:35002", "Address to listen on (must not be port 35001, which the AWS client uses for its SAML callback)")
 	listProfiles := flag.Bool("list-profiles", false, "List available AWS VPN Client profiles and exit")
 	verbose := flag.Bool("v", false, "Log the CLI output of every call, including status polls")
+	showVersion := flag.Bool("version", false, "Print the version and exit")
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Println("avpnd", buildVersion())
+		return
+	}
 
 	if *listProfiles {
 		cmd := exec.Command(*bin, "list-profiles")
@@ -63,6 +85,7 @@ func main() {
 		os.Exit(1)
 	}
 
+	logger.Info("avpnd", "version", buildVersion())
 	server := avpnd.NewServer(*profile, runner, logger)
 	if err := server.Serve(*listen); err != nil {
 		logger.Error("server error", "error", err)
