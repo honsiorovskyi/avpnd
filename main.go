@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 
 	"avpnd/internal/avpnd"
@@ -52,7 +53,17 @@ func main() {
 	}
 	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: level}))
 
-	server := avpnd.NewServer(*profile, avpnd.NewOSRunner(*bin, logger), logger)
+	cache, err := os.UserCacheDir()
+	if err != nil {
+		cache = os.TempDir()
+	}
+	runner, err := avpnd.NewOSRunner(*bin, filepath.Join(cache, "avpnd", "home"), logger)
+	if err != nil {
+		logger.Error("setting up state dir", "error", err)
+		os.Exit(1)
+	}
+
+	server := avpnd.NewServer(*profile, runner, logger)
 	if err := server.Serve(*listen); err != nil {
 		logger.Error("server error", "error", err)
 		os.Exit(1)
