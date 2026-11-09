@@ -1,0 +1,7 @@
+/examples
+/avpnd
+*.exe
+*.dll
+*.so
+.DS_Store
+

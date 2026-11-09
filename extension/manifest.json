@@ -1,0 +1,25 @@
+{
+  "manifest_version": 2,
+  "name": "avpnd",
+  "version": "0.1.1",
+  "icons": {
+    "64": "icons/64.png",
+    "48": "icons/48.png",
+    "32": "icons/32.png"
+  },
+  "description": "Controls the avpnd AWS VPN Client wrapper daemon",
+  "browser_action": {
+    "default_icon": {
+      "19": "icons/19.png",
+      "38": "icons/38.png"
+    },
+    "default_title": "avpnd"
+  },
+  "background": {
+    "scripts": ["src/background-script.js"]
+  },
+  "permissions": [
+    "tabs",
+    "http://127.0.0.1:35002/*"
+  ]
+}
