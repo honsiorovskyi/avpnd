@@ -6,26 +6,26 @@ A tiny local HTTP wrapper around the AWS VPN Client CLI (`aws-vpn-client`), so a
 
 ## Install
 
-Prebuilt macOS binaries (Apple Silicon and Intel) are on the [releases page](https://github.com/honsiorovskyi/avpnd/releases). To install the latest into `/usr/local/bin`:
+Prebuilt macOS binaries (Apple Silicon and Intel) are on the [releases page](https://github.com/honsiorovskyi/avpnd/releases). Download and verify as yourself, then install with one `sudo` command:
 
 ```bash
-V=$(curl -fsSLI -o /dev/null -w '%{url_effective}' https://github.com/honsiorovskyi/avpnd/releases/latest | sed 's|.*/v||')
-curl -fsSL "https://github.com/honsiorovskyi/avpnd/releases/download/v$V/avpnd_${V}_darwin_$(uname -m).tar.gz" | sudo tar -xz -C /usr/local/bin avpnd
-avpnd --version
-```
-
-Or, verifying the checksum first:
-
-```bash
+# 1. Download the latest release into a temp dir and verify its checksum (no root needed)
 V=$(curl -fsSLI -o /dev/null -w '%{url_effective}' https://github.com/honsiorovskyi/avpnd/releases/latest | sed 's|.*/v||')
 BASE=https://github.com/honsiorovskyi/avpnd/releases/download/v$V
-cd "$(mktemp -d)"
-curl -fsSLO "$BASE/avpnd_${V}_darwin_$(uname -m).tar.gz" -O "$BASE/checksums.txt"
-shasum -a 256 -c checksums.txt --ignore-missing
-sudo tar -xzf avpnd_*.tar.gz -C /usr/local/bin avpnd
+TMP=$(mktemp -d) && cd "$TMP" &&
+curl -fsSLO "$BASE/avpnd_${V}_darwin_$(uname -m).tar.gz" -O "$BASE/checksums.txt" &&
+shasum -a 256 -c checksums.txt --ignore-missing &&
+tar -xzf avpnd_*.tar.gz avpnd
+
+# 2. Install (the only step that needs root)
+sudo install -m 0755 avpnd /usr/local/bin/avpnd
+
+# 3. Check the installed version and clean up
+avpnd --version
+cd - >/dev/null && rm -rf "$TMP"
 ```
 
-Set `V=0.1.0` (no `v`) instead of the first line to pick a specific version. The browser extensions are on the same page as `avpnd-firefox-<version>.zip` and `avpnd-chrome-<version>.zip`; see [Browser extension](#browser-extension) for loading them. To build from source instead, see below.
+If the checksum check fails, nothing is extracted, so don't run step 2. Set `V=0.1.0` (no `v`) instead of the first line to pick a specific version. The browser extensions are on the same page as `avpnd-firefox-<version>.zip` and `avpnd-chrome-<version>.zip`; see [Browser extension](#browser-extension) for loading them. To build from source instead, see below.
 
 ## Build and run from source
 
