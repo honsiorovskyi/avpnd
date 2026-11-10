@@ -4,12 +4,42 @@ A tiny local HTTP wrapper around the AWS VPN Client CLI (`aws-vpn-client`), so a
 
 `avpnd` runs as your normal user. No root is needed.
 
-## Build and run
+## Install
+
+Prebuilt macOS binaries (Apple Silicon and Intel) are on the [releases page](https://github.com/honsiorovskyi/avpnd/releases). To install the latest into `/usr/local/bin`:
+
+```bash
+V=$(curl -fsSLI -o /dev/null -w '%{url_effective}' https://github.com/honsiorovskyi/avpnd/releases/latest | sed 's|.*/v||')
+curl -fsSL "https://github.com/honsiorovskyi/avpnd/releases/download/v$V/avpnd_${V}_darwin_$(uname -m).tar.gz" | sudo tar -xz -C /usr/local/bin avpnd
+avpnd --version
+```
+
+Or, verifying the checksum first:
+
+```bash
+V=$(curl -fsSLI -o /dev/null -w '%{url_effective}' https://github.com/honsiorovskyi/avpnd/releases/latest | sed 's|.*/v||')
+BASE=https://github.com/honsiorovskyi/avpnd/releases/download/v$V
+cd "$(mktemp -d)"
+curl -fsSLO "$BASE/avpnd_${V}_darwin_$(uname -m).tar.gz" -O "$BASE/checksums.txt"
+shasum -a 256 -c checksums.txt --ignore-missing
+sudo tar -xzf avpnd_*.tar.gz -C /usr/local/bin avpnd
+```
+
+Set `V=0.1.0` (no `v`) instead of the first line to pick a specific version. The browser extensions are on the same page as `avpnd-firefox-<version>.zip` and `avpnd-chrome-<version>.zip`; see [Browser extension](#browser-extension) for loading them. To build from source instead, see below.
+
+## Build and run from source
 
 ```bash
 make build
 ./avpnd --list-profiles          # profiles known to the AWS client
 ./avpnd -profile AWS_VPN_EU      # serve on 127.0.0.1:35002
+```
+
+Install to `/usr/local/bin` (needs root, so build first as yourself):
+
+```bash
+make build && sudo make install   # PREFIX=/some/other/prefix to change the location
+sudo make uninstall
 ```
 
 The binary is named `avpnd`, not `vpnd`, because macOS ships its own `/usr/sbin/vpnd`.

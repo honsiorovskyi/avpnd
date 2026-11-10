@@ -2,9 +2,11 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 
 # Version comes from the latest git tag (vX.Y.Z), e.g. v0.2.0 or v0.2.0-3-gabc1234-dirty.
+PREFIX ?= /usr/local
+SOURCES := $(shell find . -name '*.go' -not -path './examples/*') go.mod
 VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
 
-.PHONY: release version bump build test install vet fmt check clean help extensions snapshot
+.PHONY: release version bump build test install uninstall vet fmt check clean help extensions snapshot
 
 help:
 	@echo "avpnd - AWS VPN Client wrapper"
@@ -19,7 +21,8 @@ help:
 	@echo "  extensions - Build the Firefox and Chrome extension zips into build/extensions"
 	@echo "  snapshot   - Local goreleaser dry run (needs goreleaser)"
 	@echo "  vet     - Run go vet"
-	@echo "  install - Install avpnd to GOBIN"
+	@echo "  install - Install avpnd to $(PREFIX)/bin (run: make build && sudo make install)"
+	@echo "  uninstall - Remove it again"
 	@echo "  clean   - Remove build artifacts"
 
 version:
@@ -35,8 +38,16 @@ release:
 bump:
 	scripts/bump.sh $(BUMP)
 
+GOBUILD = go build -ldflags "-X main.version=$(VERSION)" -o avpnd
+
+# build always rebuilds (the version comes from git tags, not from the sources).
 build:
-	go build -ldflags "-X main.version=$(VERSION)" -o avpnd
+	$(GOBUILD)
+
+# avpnd is rebuilt only when the sources change, so `make build && sudo make install`
+# doesn't compile as root.
+avpnd: $(SOURCES)
+	$(GOBUILD)
 
 test:
 	go test -race ./...
@@ -44,8 +55,13 @@ test:
 vet:
 	go vet ./...
 
-install: build
-	go install
+# Installs to $(PREFIX)/bin (default /usr/local/bin, which needs root): make build && sudo make install
+install: avpnd
+	install -d $(DESTDIR)$(PREFIX)/bin
+	install -m 0755 avpnd $(DESTDIR)$(PREFIX)/bin/avpnd
+
+uninstall:
+	rm -f $(DESTDIR)$(PREFIX)/bin/avpnd
 
 clean:
 	rm -f avpnd
